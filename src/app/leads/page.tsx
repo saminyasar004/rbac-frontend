@@ -346,14 +346,14 @@ export default function LeadsPage() {
                               </Button>
 
                               <Select
-                                value={lead.assignedTo || ''}
-                                onValueChange={(userId) => handleAssignLead(lead.id, userId)}
+                                value={lead.assignedTo || "unassigned"}
+                                onValueChange={(userId) => handleAssignLead(lead.id, userId === "unassigned" ? "" : userId)}
                               >
                                 <SelectTrigger className="hidden md:flex w-36 h-8 rounded-lg text-xs font-bold border-gray-100 shadow-sm focus:ring-0">
                                   <SelectValue placeholder="Assigning..." />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-xl shadow-xl border-gray-100">
-                                  <SelectItem value="" className="text-xs font-medium rounded-lg">Unassign</SelectItem>
+                                  <SelectItem value="unassigned" className="text-xs font-medium rounded-lg">Unassign</SelectItem>
                                   {users.map((u) => (
                                     <SelectItem key={u.id} value={u.id} className="text-xs font-medium rounded-lg">
                                       {u.firstName} {u.lastName}
