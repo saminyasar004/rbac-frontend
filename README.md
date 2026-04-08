@@ -64,7 +64,7 @@ src/
 Create `.env.local`:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=https://rbac-server-56ny.onrender.com
 ```
 
 ### Installation
