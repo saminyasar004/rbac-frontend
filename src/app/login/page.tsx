@@ -15,8 +15,8 @@ export default function LoginPage() {
 	const router = useRouter();
 	const { login, getBootstrapStatus, isBootstrapped } = useAuthStore();
 
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
+	const [email, setEmail] = useState("admin@example.com");
+	const [password, setPassword] = useState("admin123456");
 	const [showPassword, setShowPassword] = useState(false);
 	const [rememberMe, setRememberMe] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -94,11 +94,19 @@ export default function LoginPage() {
 							<div className="mb-8 p-5 bg-orange-50 border border-orange-200 rounded-2xl flex flex-col gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
 								<div className="flex gap-3">
 									<div className="w-10 h-10 rounded-full bg-orange-400/10 flex items-center justify-center shrink-0">
-										<AlertCircle className="text-orange-600" size={20} />
+										<AlertCircle
+											className="text-orange-600"
+											size={20}
+										/>
 									</div>
 									<div className="space-y-1">
-										<p className="text-[14px] font-bold text-gray-900 leading-none">System Not Initialized</p>
-										<p className="text-[12px] text-gray-500 font-medium">Create the first Admin account to bootstrap the RBAC system.</p>
+										<p className="text-[14px] font-bold text-gray-900 leading-none">
+											System Not Initialized
+										</p>
+										<p className="text-[12px] text-gray-500 font-medium">
+											Create the first Admin account to
+											bootstrap the RBAC system.
+										</p>
 									</div>
 								</div>
 								<Link href="/signup">
