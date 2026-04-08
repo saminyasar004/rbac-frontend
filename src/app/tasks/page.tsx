@@ -21,6 +21,12 @@ import {
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+interface User {
+	id: string;
+	firstName: string;
+	lastName: string;
+}
+
 interface Task {
 	id: string;
 	title: string;
@@ -29,7 +35,8 @@ interface Task {
 	priority: "LOW" | "MEDIUM" | "HIGH";
 	dueDate: string;
 	assignedTo: string;
-	assignee?: {
+	assignedUser?: {
+		id: string;
 		firstName: string;
 		lastName: string;
 	};
@@ -38,6 +45,7 @@ interface Task {
 export default function TasksPage() {
 	const { hasPermission } = useAuthStore();
 	const [tasks, setTasks] = useState<Task[]>([]);
+	const [users, setUsers] = useState<User[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showAddDialog, setShowAddDialog] = useState(false);
@@ -51,6 +59,7 @@ export default function TasksPage() {
 
 	useEffect(() => {
 		fetchTasks();
+		fetchUsers();
 	}, []);
 
 	const fetchTasks = async () => {
@@ -61,6 +70,15 @@ export default function TasksPage() {
 			console.error("Failed to fetch tasks:", error);
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const fetchUsers = async () => {
+		try {
+			const { data } = await api.get("/users");
+			setUsers(data);
+		} catch (error) {
+			console.error("Failed to fetch users:", error);
 		}
 	};
 
@@ -82,6 +100,15 @@ export default function TasksPage() {
 			fetchTasks();
 		} catch (error) {
 			console.error("Failed to update task status:", error);
+		}
+	};
+
+	const handleAssignTask = async (taskId: string, userId: string) => {
+		try {
+			await api.patch(`/tasks/${taskId}`, { assignedTo: userId === "unassigned" ? null : userId });
+			fetchTasks();
+		} catch (error) {
+			console.error("Failed to assign task:", error);
 		}
 	};
 
@@ -263,14 +290,29 @@ export default function TasksPage() {
 												</Select>
 											</TableCell>
 											<TableCell className="px-6 py-4">
-												<div className="flex items-center gap-2">
-													<div className="w-7 h-7 bg-primary/10 text-primary text-[10px] font-black rounded-lg flex items-center justify-center uppercase">
-														{task.assignee?.firstName?.[0] || "U"}
-													</div>
-													<span className="text-sm font-bold text-gray-700">
-														{task.assignee ? `${task.assignee.firstName} ${task.assignee.lastName}` : "Unassigned"}
-													</span>
-												</div>
+												<Select 
+													value={task.assignedTo || "unassigned"} 
+													onValueChange={(userId) => handleAssignTask(task.id, userId)}
+												>
+													<SelectTrigger className="w-full bg-transparent border-none p-0 focus:ring-0 shadow-none hover:bg-gray-100/50 rounded-lg transition-colors px-2 -ml-2">
+														<div className="flex items-center gap-2">
+															<div className="w-7 h-7 bg-primary/10 text-primary text-[10px] font-black rounded-lg flex items-center justify-center uppercase shrink-0">
+																{task.assignedUser?.firstName?.[0] || "U"}
+															</div>
+															<span className="text-sm font-bold text-gray-700 truncate max-w-[120px]">
+																{task.assignedUser ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}` : "Unassigned"}
+															</span>
+														</div>
+													</SelectTrigger>
+													<SelectContent className="rounded-xl font-bold">
+														<SelectItem value="unassigned" className="text-gray-400">Unassigned</SelectItem>
+														{users.map((u) => (
+															<SelectItem key={u.id} value={u.id}>
+																{u.firstName} {u.lastName}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 											</TableCell>
 											<TableCell className="px-6 py-4">
 												<span className="text-sm font-bold text-gray-500">
